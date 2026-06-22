@@ -161,7 +161,7 @@ class StatsPanel(QWidget):
 
 
 class InfoPanel(QWidget):
-    # Close button rect (top-right corner)
+
     CLOSE_BTN = QRect(230, 8, 22, 22)
 
     def __init__(self):
@@ -184,8 +184,6 @@ class InfoPanel(QWidget):
         self._is_eating    = False
         self._is_busy      = False
         self._close_hovered = False
-
-        # Global click filter to dismiss when clicking outside
         self._click_filter = _ClickOutsideFilter(self)
         QApplication.instance().installEventFilter(self._click_filter)
 
@@ -211,8 +209,7 @@ class InfoPanel(QWidget):
         self.move(x, y)
         self.show()
         self.raise_()
-
-    # ── mouse events for close button ──────────────────────────────────────
+      
     def mouseMoveEvent(self, event):
         hovered = self.CLOSE_BTN.contains(event.position().toPoint())
         if hovered != self._close_hovered:
@@ -229,7 +226,6 @@ class InfoPanel(QWidget):
             self._close_hovered = False
             self.update()
 
-    # ── painting ────────────────────────────────────────────────────────────
     def _status_dot_color(self, value):
         if value > 0.60:
             return QColor(80, 220, 120)
@@ -250,7 +246,6 @@ class InfoPanel(QWidget):
         W = self.width()
         pad = 16
 
-        # ── Close button ────────────────────────────────────────────────────
         btn = self.CLOSE_BTN
         btn_bg = QColor(180, 60, 60, 200) if self._close_hovered else QColor(80, 80, 110, 160)
         p.setBrush(btn_bg)
@@ -258,9 +253,7 @@ class InfoPanel(QWidget):
         p.drawRoundedRect(btn, 5, 5)
         p.setFont(QFont("Segoe UI", 9, QFont.Weight.Bold))
         p.setPen(QColor(220, 220, 240))
-        p.drawText(btn, Qt.AlignmentFlag.AlignCenter, "✕")
-
-        # Title
+        p.drawText(btn, Qt.AlignmentFlag.AlignCenter, "✕")  # Title
         p.setFont(QFont("Segoe UI", 13, QFont.Weight.Bold))
         p.setPen(QColor(240, 240, 255))
         p.drawText(QRect(pad, 14, W - pad * 2 - 30, 24), Qt.AlignmentFlag.AlignLeft, "🐾  Nino")
@@ -271,8 +264,7 @@ class InfoPanel(QWidget):
 
         p.setPen(QPen(QColor(60, 60, 100), 1))
         p.drawLine(pad, 60, W - pad, 60)
-
-        # Current state
+                   
         p.setFont(QFont("Segoe UI", 8, QFont.Weight.Bold))
         p.setPen(QColor(160, 160, 200))
         p.drawText(QRect(pad, 70, W - pad * 2, 14), Qt.AlignmentFlag.AlignLeft, "CURRENT STATE")
@@ -296,7 +288,6 @@ class InfoPanel(QWidget):
         p.setPen(fg_col)
         p.drawText(badge_rect, Qt.AlignmentFlag.AlignCenter, self._state_label)
 
-        # User activity
         p.setFont(QFont("Segoe UI", 8, QFont.Weight.Bold))
         p.setPen(QColor(160, 160, 200))
         p.drawText(QRect(pad, 126, 80, 14), Qt.AlignmentFlag.AlignLeft, "USER")
@@ -309,8 +300,6 @@ class InfoPanel(QWidget):
 
         p.setPen(QPen(QColor(60, 60, 100), 1))
         p.drawLine(pad, 146, W - pad, 146)
-
-        # Stats
         p.setFont(QFont("Segoe UI", 8, QFont.Weight.Bold))
         p.setPen(QColor(160, 160, 200))
         p.drawText(QRect(pad, 154, W - pad * 2, 14), Qt.AlignmentFlag.AlignLeft, "STATS")
@@ -362,7 +351,6 @@ class InfoPanel(QWidget):
 
 
 class _ClickOutsideFilter(QObject):
-    """Hides the InfoPanel when the user clicks anywhere outside it."""
     def __init__(self, panel: InfoPanel):
         super().__init__(panel)
         self._panel = panel
@@ -370,7 +358,6 @@ class _ClickOutsideFilter(QObject):
     def eventFilter(self, obj, event):
         if (self._panel.isVisible()
                 and event.type() == QEvent.Type.MouseButtonPress):
-            # Map the click to global coords
             try:
                 global_pos = event.globalPosition().toPoint()
             except AttributeError:
@@ -378,7 +365,7 @@ class _ClickOutsideFilter(QObject):
             panel_rect = QRect(self._panel.pos(), self._panel.size())
             if not panel_rect.contains(global_pos):
                 self._panel.hide()
-        return False  # never consume the event
+        return False 
 
 
 class Pet(QLabel):
@@ -487,8 +474,6 @@ class Pet(QLabel):
         self._info_panel_refresh_timer.start(500)
 
         self._start_walk()
-
-    # ── helpers ─────────────────────────────────────────────────────────────
 
     def _current_frames(self):
         if self._is_eating:   return self.eating_frames
@@ -750,8 +735,6 @@ class Pet(QLabel):
         self._chrome_walk_timer = QTimer(self)
         self._chrome_walk_timer.timeout.connect(step)
         self._chrome_walk_timer.start(20)
-
-    # ── Qt events ────────────────────────────────────────────────────────────
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
